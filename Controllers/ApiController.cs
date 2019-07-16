@@ -18,13 +18,11 @@ namespace ApiController.Controllers
             _context = context;
             if (_context.CustomerList.Count() == 0)
             {
-                // Create a new CustomerList if collection is empty
-                List<CusomterSale> cs = new List<CusomterSale>();
-                _context.CustomerList.Add(new CustomerModel { Name = "Customer 1", CustomerSales = cs });
-                _context.CustomerList.Add(new CustomerModel { Name = "Customer 2", CustomerSales = cs });
-                _context.CustomerList.Add(new CustomerModel { Name = "Customer 3", CustomerSales = cs });
-                _context.CustomerList.Add(new CustomerModel { Name = "Customer 4", CustomerSales = cs });
-                _context.CustomerList.Add(new CustomerModel { Name = "Customer 5", CustomerSales = cs });
+                _context.CustomerList.Add(new CustomerModel { Name = "Customer 1", saleIdList = "" });
+                _context.CustomerList.Add(new CustomerModel { Name = "Customer 2", saleIdList = "" });
+                _context.CustomerList.Add(new CustomerModel { Name = "Customer 3", saleIdList = "" });
+                _context.CustomerList.Add(new CustomerModel { Name = "Customer 4", saleIdList = "" });
+                _context.CustomerList.Add(new CustomerModel { Name = "Customer 5", saleIdList = "" });
                 _context.SaveChanges();
             }
             if (_context.SalesList.Count() == 0)
@@ -134,29 +132,97 @@ namespace ApiController.Controllers
         [Route("linkcustomersales/{custId:long}/{salesId:long}")]
         public async Task<IActionResult> LinkCustomerSalesRep(long custId, long salesId)
         {
-            CustomerModel cust = await _context.CustomerList.FindAsync(custId);
+            var cust = await _context.CustomerList.FindAsync(custId);
 
-            SalesRepModel sale = await _context.SalesList.FindAsync(salesId);
-            //ATTEMPT
-            var customerObj = _context.CustomerList
-                .Single(p => p.ID == custId);
 
-            var salesObj = _context.SalesList
-                .Single(p => p.ID == salesId);
-
-            CusomterSale cs = new CusomterSale();
-            cs.customer = cust;
-            cs.salesrep = salesObj;
-            //customerObj.CustomerSales = new System.Collections.Generic.ICollection<webApiSoftwareOne.Models.CusomterSale>();
-            customerObj.CustomerSales.Add(new CusomterSale()
+            if (cust.saleIdList.Length > 0)
             {
-                customer = cust,
-                salesrep = salesObj
-            });
-            _context.CustomerList.Attach(customerObj);
-            _context.Entry(customerObj).State = EntityState.Modified;
+
+                cust.saleIdList = cust.saleIdList.ToString() + "," + salesId.ToString();
+            }
+            else
+            {
+                cust.saleIdList = salesId.ToString();
+            }
+            _context.CustomerList.Attach(cust);
+            _context.Entry(cust).State = EntityState.Modified;
+
+            _context.SaveChangesAsync();
+            var sale = await _context.SalesList.FindAsync(salesId);
+
+            if (sale.custIdList.Length > 0)
+            {
+
+                sale.custIdList = sale.custIdList.Length.ToString() + "," + custId.ToString();
+            }
+            else
+            {
+                sale.custIdList = custId.ToString();
+            }
+
+            _context.SalesList.Attach(sale);
+            _context.Entry(sale).State = EntityState.Modified;
+            return NoContent();
+        }
+        [HttpPut]
+        [Route("unlinkcustomersales/{custId:long}/{salesId:long}")]
+        public async Task<IActionResult> UnLinkCustomerSalesRep(long custId, long salesId)
+        {
+            var cust = await _context.CustomerList.FindAsync(custId);
+            var sale = await _context.SalesList.FindAsync(salesId);
+            var ct = cust.saleIdList;
+            var a = ct.Split(",");
+            int numIndex = System.Array.IndexOf(a, salesId.ToString());
+            a = a.Where((val, idx) => idx != numIndex).ToArray();
+            ct = string.Join(",", a);
+            cust.saleIdList = ct;
+
+            _context.CustomerList.Attach(cust);
+            _context.Entry(cust).State = EntityState.Modified;
+            _context.SalesList.Attach(sale);
+            _context.Entry(sale).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+        [HttpGet]
+        [Route("getspecificsalesrepresentative/{custId:long}")]
+        public async Task<ActionResult<List<SalesRepModel>>> GetSpecificSalesRepresentative(long custId)
+        {
+            var cust = await _context.CustomerList.FindAsync(custId);
+
+            List<SalesRepModel> sp = new List<SalesRepModel>();
+
+            var ct = cust.saleIdList;
+            var a = ct.Split(",");
+
+            foreach (var item in a)
+            {
+
+                var c = await _context.SalesList.FindAsync(long.Parse(item));
+                sp.Add(c);
+            }
+
+
+            return sp;
+        }
+        [HttpGet]
+        [Route("getspecificcustomer/{saleId:long}")]
+        public async Task<ActionResult<List<CustomerModel>>> GetSpecificCustomer(long custId)
+        {
+            var sale = await _context.SalesList.FindAsync(custId);
+
+            List<CustomerModel> cm = new List<CustomerModel>();
+
+            var ct = sale.custIdList;
+            var a = ct.Split(",");
+
+            foreach (var item in a)
+            {
+
+                var c = await _context.CustomerList.FindAsync(long.Parse(item));
+                cm.Add(c);
+            }
+            return cm;
         }
     }
 }

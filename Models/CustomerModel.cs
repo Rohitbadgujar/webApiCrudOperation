@@ -6,6 +6,6 @@ namespace webApiSoftwareOne.Models
     {
         public long ID { get; set; }
         public string Name { get; set; }
-        public virtual ICollection<CusomterSale> CustomerSales {get;set;}
+        public string saleIdList {get;set;}
     }
 }
