@@ -1,0 +1,14 @@
+C:\Users\rohit\webApiSoftwareOne\bin\Debug\netcoreapp2.1\webApiSoftwareOne.deps.json
+C:\Users\rohit\webApiSoftwareOne\bin\Debug\netcoreapp2.1\webApiSoftwareOne.runtimeconfig.json
+C:\Users\rohit\webApiSoftwareOne\bin\Debug\netcoreapp2.1\webApiSoftwareOne.runtimeconfig.dev.json
+c:\Users\rohit\webApiSoftwareOne\bin\Debug\netcoreapp2.1\webApiSoftwareOne.dll
+c:\Users\rohit\webApiSoftwareOne\bin\Debug\netcoreapp2.1\webApiSoftwareOne.pdb
+c:\Users\rohit\webApiSoftwareOne\obj\Debug\netcoreapp2.1\webApiSoftwareOne.csprojAssemblyReference.cache
+c:\Users\rohit\webApiSoftwareOne\obj\Debug\netcoreapp2.1\webApiSoftwareOne.csproj.CoreCompileInputs.cache
+c:\Users\rohit\webApiSoftwareOne\obj\Debug\netcoreapp2.1\webApiSoftwareOne.RazorAssemblyInfo.cache
+c:\Users\rohit\webApiSoftwareOne\obj\Debug\netcoreapp2.1\webApiSoftwareOne.RazorAssemblyInfo.cs
+c:\Users\rohit\webApiSoftwareOne\obj\Debug\netcoreapp2.1\webApiSoftwareOne.AssemblyInfoInputs.cache
+c:\Users\rohit\webApiSoftwareOne\obj\Debug\netcoreapp2.1\webApiSoftwareOne.AssemblyInfo.cs
+c:\Users\rohit\webApiSoftwareOne\obj\Debug\netcoreapp2.1\webApiSoftwareOne.RazorTargetAssemblyInfo.cache
+c:\Users\rohit\webApiSoftwareOne\obj\Debug\netcoreapp2.1\webApiSoftwareOne.dll
+c:\Users\rohit\webApiSoftwareOne\obj\Debug\netcoreapp2.1\webApiSoftwareOne.pdb
