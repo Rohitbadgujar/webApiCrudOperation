@@ -28,10 +28,10 @@ namespace ApiController.Controllers
             if (_context.SalesList.Count() == 0)
             {
                 // Create a new SalesList if collection is empty
-                _context.SalesList.Add(new SalesRepModel { FirstName = "Sale Rep1", LastName = "Sales1" });
-                _context.SalesList.Add(new SalesRepModel { FirstName = "Sale Rep2", LastName = "Sales2" });
-                _context.SalesList.Add(new SalesRepModel { FirstName = "Sale Rep3", LastName = "Sales3" });
-                _context.SalesList.Add(new SalesRepModel { FirstName = "Sale Rep4", LastName = "Sale4" });
+                _context.SalesList.Add(new SalesRepModel { FirstName = "Sale Rep1", LastName = "Sales1", custIdList = "" });
+                _context.SalesList.Add(new SalesRepModel { FirstName = "Sale Rep2", LastName = "Sales2", custIdList = "" });
+                _context.SalesList.Add(new SalesRepModel { FirstName = "Sale Rep3", LastName = "Sales3", custIdList = "" });
+                _context.SalesList.Add(new SalesRepModel { FirstName = "Sale Rep4", LastName = "Sale4", custIdList = "" });
                 _context.SaveChanges();
             }
         }
@@ -101,7 +101,9 @@ namespace ApiController.Controllers
         public async Task<IActionResult> DeleteCustomerById(long id)
         {
             var cust = await _context.CustomerList.FindAsync(id);
-
+            if( cust == null){
+                    return NotFound("Resource not found");
+             } 
             if (cust == null)
             {
                 return NotFound();
@@ -117,7 +119,9 @@ namespace ApiController.Controllers
         public async Task<IActionResult> DeleteSalesRepById(long id)
         {
             var sales = await _context.SalesList.FindAsync(id);
-
+            if( sales == null){
+                    return NotFound("Resource not found");
+             } 
             if (sales == null)
             {
                 return NotFound();
@@ -134,7 +138,10 @@ namespace ApiController.Controllers
         {
             var cust = await _context.CustomerList.FindAsync(custId);
 
-
+            var sale = await _context.SalesList.FindAsync(salesId);
+            if(cust == null || sale == null){
+                    return NotFound("Resource not found");
+             }  
             if (cust.saleIdList.Length > 0)
             {
 
@@ -146,9 +153,6 @@ namespace ApiController.Controllers
             }
             _context.CustomerList.Attach(cust);
             _context.Entry(cust).State = EntityState.Modified;
-
-            _context.SaveChangesAsync();
-            var sale = await _context.SalesList.FindAsync(salesId);
 
             if (sale.custIdList.Length > 0)
             {
@@ -162,6 +166,7 @@ namespace ApiController.Controllers
 
             _context.SalesList.Attach(sale);
             _context.Entry(sale).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
             return NoContent();
         }
         [HttpPut]
@@ -170,12 +175,22 @@ namespace ApiController.Controllers
         {
             var cust = await _context.CustomerList.FindAsync(custId);
             var sale = await _context.SalesList.FindAsync(salesId);
-            var ct = cust.saleIdList;
-            var a = ct.Split(",");
-            int numIndex = System.Array.IndexOf(a, salesId.ToString());
-            a = a.Where((val, idx) => idx != numIndex).ToArray();
-            ct = string.Join(",", a);
-            cust.saleIdList = ct;
+            if(cust == null || sale == null){
+                    return NotFound("Resource not found");
+            }
+            var custIdStr = sale.custIdList;
+            var saleArr = custIdStr.Split(",");
+            int numIndex1 = System.Array.IndexOf(saleArr, custId.ToString());
+            saleArr = saleArr.Where((val, idx) => idx != numIndex1).ToArray();
+            custIdStr = string.Join(",", saleArr);
+            sale.custIdList = custIdStr;
+
+            var salesIdStr = cust.saleIdList;
+            var custArr = salesIdStr.Split(",");
+            int numIndex2 = System.Array.IndexOf(custArr, salesId.ToString());
+            custArr = custArr.Where((val, idx) => idx != numIndex2).ToArray();
+            salesIdStr = string.Join(",", custArr);
+            cust.saleIdList = salesIdStr;
 
             _context.CustomerList.Attach(cust);
             _context.Entry(cust).State = EntityState.Modified;
@@ -189,7 +204,9 @@ namespace ApiController.Controllers
         public async Task<ActionResult<List<SalesRepModel>>> GetSpecificSalesRepresentative(long custId)
         {
             var cust = await _context.CustomerList.FindAsync(custId);
-
+            if(cust == null){
+                    return NotFound("Resource not found");
+            }
             List<SalesRepModel> sp = new List<SalesRepModel>();
 
             var ct = cust.saleIdList;
@@ -210,7 +227,9 @@ namespace ApiController.Controllers
         public async Task<ActionResult<List<CustomerModel>>> GetSpecificCustomer(long custId)
         {
             var sale = await _context.SalesList.FindAsync(custId);
-
+            if(sale == null){
+                    return NotFound("Resource not found");
+            }
             List<CustomerModel> cm = new List<CustomerModel>();
 
             var ct = sale.custIdList;
